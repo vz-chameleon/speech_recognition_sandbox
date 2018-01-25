@@ -43,13 +43,24 @@ public class DataParser {
 			String[] testphonems = split[1].split(" ");
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
-//			String recognisedWord, String[] recognisedWordphonems, in/double cost = getrecognisedWordwithPhonemsAndCost(testphonems,LexicPhonemsAList)
+			SimpleEntry<String, SimpleEntry<String[],Double>> result  = getrecognisedWordwithPhonemsAndCost(testphonems,LexicPhonemsAList);
+			String recognisedWord = result.getKey();
+			String[] recognisedWordphonems = result.getValue().getKey();
+			double cost = result.getValue().getValue();
+			
 //			log this to file
 //			logtofile(bw, testword, testphonems, recognisedWord, recognisedWordphonems, cost);
 		}
 		br.close();
 		bw.close();
 	}
+	
+	public SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithPhonemsAndCost(String[] testphonems,ArrayList<SimpleEntry<String,String[]>> LexicPhonemsAList){
+		//TODO
+		return null;
+		
+	}
+
 	
 	public void logtofile(Writer filewriter, String motTest, String[] phonesTest, String motReconnu){
 //		log this to file : <mot test> [phones test]  <mot reconnu> [phones ref] ok/err cout align

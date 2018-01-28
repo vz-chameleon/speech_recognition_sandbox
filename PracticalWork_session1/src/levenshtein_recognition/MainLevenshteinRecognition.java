@@ -2,9 +2,11 @@ package levenshtein_recognition;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
@@ -12,7 +14,7 @@ import utils.DataParser;
 
 public class MainLevenshteinRecognition {	
 	
-	public static void reco_dist_levenshtein(String lex, String test) throws IOException{
+	public static void reco_dist_levenshtein(File lex, File test) throws IOException{
 		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.tex_or_test_to_HashMap(lex);
 		

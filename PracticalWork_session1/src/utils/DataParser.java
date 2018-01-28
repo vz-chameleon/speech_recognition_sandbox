@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
@@ -9,8 +10,8 @@ import java.util.HashMap;
 
 public class DataParser {
 	
-	public static HashMap<String,String[]> tex_or_test_to_HashMap(String filename) throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(filename));
+	public static HashMap<String,String[]> tex_or_test_to_HashMap(File lex) throws IOException {
+		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> WordPhonemsHashmap = new  HashMap<String,String[]>();
 		
 		String line;

@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class DataParser {
@@ -35,8 +36,28 @@ public class DataParser {
 	 * @param cost The Levenshtein cost to go from phonesTest to phonesReconnu
 	 * @throws IOException
 	 */
-	public void logtofile(Writer filewriter, String motTest, String[] phonesTest, String motReconnu, String[] phonesReconnu, double cost) throws IOException{
-		String logString = motTest + " ["+phonesTest+"] "+ motReconnu + " [" + phonesReconnu + "] "+ cost;
+	public static void logtofile(Writer filewriter, String motTest, String[] phonesTest, String motReconnu, String[] phonesReconnu, double cost, String[] alignment) throws IOException{
+		StringBuilder sb = new StringBuilder();
+		for (String str : phonesTest)
+			sb.append(str+" ");
+		sb.deleteCharAt(sb.length());
+		String phonesTestString = sb.toString();
+		sb.setLength(0);
+		for (String str : phonesReconnu)
+			sb.append(str+" ");
+		sb.deleteCharAt(sb.length());
+		String phonesReconnuString = sb.toString();
+		sb.setLength(0);
+		for (String str : alignment)
+			sb.append(str+" ");
+		sb.deleteCharAt(sb.length());
+		String alignmentString = sb.toString();
+		sb.setLength(0);
+
+		
+		
+		
+		String logString = motTest + "\t["+phonesTestString+"]\t"+ motReconnu + "\t[" + phonesReconnuString + "]\t"+ cost+ "\t"+alignmentString;
 		filewriter.write(logString);
 	}
 

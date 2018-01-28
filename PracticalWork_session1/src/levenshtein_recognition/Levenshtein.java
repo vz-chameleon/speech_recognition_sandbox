@@ -6,15 +6,43 @@ import java.util.Collections;
 import java.util.HashMap;
 
 public class Levenshtein {
-	private static double coutInsertion = 1.;
-	private static double coutOmission = 1.;
-	private static HashMap<Object, HashMap<Object, Double>> coutSubstitutionMap = null;
+	public static double coutInsertion = 1.;
+	public static double coutOmission = 1.;
+	public static HashMap<Object, HashMap<Object, Double>> coutSubstitutionMap = null;
+	public static HashMap<Object, Double> coutInsertionMap = null;
+	public static HashMap<Object, Double> coutOmissionMap = null;
 
-	private static double  coutSubstitution(Object c1, Object c2) {
+	private static double  coutSubstitution(Object[] seq1, Object[] seq2, int i, int j) {
+		if (i<0 || j<0)
+			return Double.MAX_VALUE;
+		Object c1 = seq1[i];
+		Object c2 = seq2[j];		
 		if (coutSubstitutionMap == null) {
-			return (!c1.equals(c2))?1.:0.;
+			return (c1.equals(c2))?0.:1.;
 		}else
 			return coutSubstitutionMap.get(c1).get(c2);
+
+	}
+	
+	private static double  coutInsertion(Object[] seq, int i) {
+		if (i<0)
+			return Double.MAX_VALUE;
+		Object c = seq[i];		
+		if (coutSubstitutionMap == null) {
+			return 1.;
+		}else
+			return coutInsertionMap.get(c);
+
+	}
+	
+	private static double  coutOmission(Object[] seq, int i) {
+		if (i<0)
+			return Double.MAX_VALUE;
+		Object c = seq[i];
+		if (coutSubstitutionMap == null) {
+			return 1.;
+		}else
+			return coutOmissionMap.get(c);
 
 	}
 
@@ -28,21 +56,24 @@ public class Levenshtein {
 
 	private static double D(Object[] c1, Object[] c2,int i, int j, char[][] path) {
 		//		System.out.println("D called with aruments : "+c1+", "+ c2 + ", "+i+ ", "+ j);
-		if (i<0 || j<0)
+		if (i==-1 && j==-1)
 			return 0;
+		else if (i==-2 || j==-2)
+			return Double.MAX_VALUE;
 
-		double sub = D(c1,c2,i-1,j-1,path)+coutSubstitution(c1[i], c2[j]);
-		double ins = D(c1, c2, i-1,j,path)+coutInsertion;
-		double omi = D(c1, c2, i,j-1,path)+coutOmission;
+
+		double sub = D(c1,c2,i-1,j-1,path)+coutSubstitution(c1, c2, i, j);
+		double ins = D(c1, c2, i-1,j,path)+coutInsertion(c1,i);
+		double omi = D(c1, c2, i,j-1,path)+coutOmission(c2,j);
 
 		double min = Math.min(Math.min(sub, ins), omi);
 
 		if (sub == min)
-			path[i][j]='s';
+			path[i+1][j+1]='s';
 		else if (ins == min)
-			path[i][j]='i';
+			path[i+1][j+1]='i';
 		else 
-			path[i][j]='o';
+			path[i+1][j+1]='o';
 		return min;
 	}
 
@@ -50,24 +81,37 @@ public class Levenshtein {
 		int i = path.length-1;
 		int j = path[0].length-1;
 		ArrayList<Character> optimalTransformation = new ArrayList<>();
-
-		while (i>=0 & j>=0) {
+		boolean loopCondition = true;
+		while (loopCondition) {
+			loopCondition = (i!=0 || j != 0);
 			switch (path[i][j]) {
 			case 's':
-				optimalTransformation.add(0,'s');
-//				System.out.println("i,j = "+i+","+j+"   ...... 's'");
+				optimalTransformation.add('s');
+				System.out.println("i,j = "+i+","+j+"   ...... 's'");
 				i-=1;j-=1;
+				
+				if (i==0 & j==-1)
+					j++;
+				else if (j==0 & i==-1)
+					i++;
 				break;
 			case 'i':
-				optimalTransformation.add(0,'i');
-//				System.out.println("i,j = "+i+","+j+"   ...... 'i'");
+				optimalTransformation.add('i');
+				System.out.println("i,j = "+i+","+j+"   ...... 'i'");
 				i-=1;
 				break;
 			case 'o':
-				optimalTransformation.add(0,'o');
-//				System.out.println("i,j = "+i+","+j+"   ...... 'o'");
+				optimalTransformation.add('o');
+				System.out.println("i,j = "+i+","+j+"   ...... 'o'");
 				j-=1;
 				break;
+			}
+			if (i>0 & j==-1) {
+				i--;
+				j++;
+			}else if (j>0 & i==-1) {
+				j--;
+				i++;
 			}
 		}
 		Collections.reverse(optimalTransformation);
@@ -100,10 +144,10 @@ public class Levenshtein {
 
 	public static void main(String[] args) {
 
-		String[] seq1 = "animal".split("(?!^)");
-		String[] seq2 = "animel".split("(?!^)");
+		String[] seq1 = "abaarbolesww".split("(?!^)");
+		String[] seq2 = "baarbresrw".split("(?!^)");
 
-		char[][] path = new char[seq1.length][seq2.length];
+		char[][] path = new char[seq1.length+1][seq2.length+1];
 
 		System.out.println("Distance between '"+Arrays.deepToString(seq1)+"' and '"+Arrays.deepToString(seq2)+"' : "+levenshteinDistance(seq1, seq2, path));
 
@@ -121,25 +165,28 @@ public class Levenshtein {
 	public static String[] optimalTransformationsDisplayableStringArray(char[][] path, Object[] seq1,
 			Object[] seq2) {
 
-		int i = seq1.length-1;
-		int j = seq2.length-1;
+		int i = path.length-1;
+		int j = path[0].length-1;
 		ArrayList<String> optimalTransformationString = new ArrayList<>();
 
-		while (i>=0 & j>=0) {
+		boolean loopCondition = true;
+		while (loopCondition) {
+			loopCondition = (i!=0 || j != 0);
+
 			switch (path[i][j]) {
 			case 's':
-				if (seq1[i].equals(seq2[j]))
-					optimalTransformationString.add(seq1[i].toString());
+				if (seq1[i-1].equals(seq2[j-1]))
+					optimalTransformationString.add(seq1[i-1].toString());
 				else
-					optimalTransformationString.add("("+seq1[i]+"=>"+seq2[j]+")");
+					optimalTransformationString.add("("+seq2[j-1]+"=>"+seq1[i-1]+")");
 				i-=1;j-=1;
 				break;
 			case 'i':
-				optimalTransformationString.add("(=>"+seq2[j]+")");
+				optimalTransformationString.add("(=>"+seq1[i-1]+")");
 				i-=1;
 				break;
 			case 'o':
-				optimalTransformationString.add("("+seq1[i]+"=>)");
+				optimalTransformationString.add("("+seq2[j-1]+"=>)");
 				j-=1;
 				break;
 			}

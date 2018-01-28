@@ -6,27 +6,26 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
+
 import utils.DataParser;
 
 public class MainLevenshteinRecognition {	
 	
 	public static void reco_dist_levenshtein(File lex, File test) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.tex_or_test_to_HashMap(lex);
 		
 		String line;	
-		br.close();
-		br = new BufferedReader(new FileReader(test));
+		BufferedReader br = new BufferedReader(new FileReader(test));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(test+".testLog"));
 		while ((line = br.readLine()) != null) {
 	
 			String split[]= line.split("\t");
+//			System.out.println(Arrays.deepToString(split));
 			String testword = split[0];
-			String[] testphonems = split[1].split(" ");
+			String[] testphonems = (split.length==2)?split[1].split(" "): new String[] {"unknown"};
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
 			SimpleEntry<String, SimpleEntry<String[],Double>> result  = getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
@@ -48,7 +47,7 @@ public class MainLevenshteinRecognition {
 		String[] closestAlignment= null;
 		for (Entry<String, String[]> word_phonems_entry : LexicPhonemsAList.entrySet()) {
 			String[] lexphonems = word_phonems_entry.getValue();
-			char[][] tempPath = new char[testphonems.length][lexphonems.length];
+			char[][] tempPath = new char[testphonems.length+1][lexphonems.length+1];
 			double tempCost = Levenshtein.levenshteinDistance(testphonems, lexphonems, tempPath);
 			
 			if (cost>tempCost) {
@@ -63,10 +62,70 @@ public class MainLevenshteinRecognition {
 	
 	/**
 	 * @param args
+	 * @throws IOException 
 	 */
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
+	public static void main(String[] args) throws IOException {
+//		===================1syll================
+		System.out.println("===================1syll================");
 
+		File lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-1syll-0100words.lex");
+		File testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-1syll-0100words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-1syll-0500words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-1syll-0500words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-1syll-1000words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-1syll-1000words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		
+//		===================2syll================
+		System.out.println("===================2syll================");
+
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-2syll-0100words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-2syll-0100words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-2syll-0500words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-2syll-0500words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-2syll-1000words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-2syll-1000words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+//		===================3syll================
+		System.out.println("===================3syll================");
+
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-3syll-0100words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-3syll-0100words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-3syll-0500words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-3syll-0500words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-3syll-1000words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-3syll-1000words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+//		===================4+syll================
+		System.out.println("===================4+syll================");
+
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-4+syll-0100words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-4+syll-0100words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-4+syll-0500words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-4+syll-0500words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
+		lexpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/lexicon-4+syll-1000words.lex");
+		testpath = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-4+syll-1000words.test");
+		reco_dist_levenshtein(lexpath,testpath);
+		
 	}
 
 }

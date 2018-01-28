@@ -41,24 +41,24 @@ public class DataParser {
 		StringBuilder sb = new StringBuilder();
 		for (String str : phonesTest)
 			sb.append(str+" ");
-		sb.deleteCharAt(sb.length());
+		sb.deleteCharAt(sb.length()-1);
 		String phonesTestString = sb.toString();
 		sb.setLength(0);
 		for (String str : phonesReconnu)
 			sb.append(str+" ");
-		sb.deleteCharAt(sb.length());
+		sb.deleteCharAt(sb.length()-1);
 		String phonesReconnuString = sb.toString();
 		sb.setLength(0);
 		for (String str : alignment)
 			sb.append(str+" ");
-		sb.deleteCharAt(sb.length());
+		sb.deleteCharAt(sb.length()-1);
 		String alignmentString = sb.toString();
 		sb.setLength(0);
 
 		
 		
 		
-		String logString = motTest + "\t["+phonesTestString+"]\t"+ motReconnu + "\t[" + phonesReconnuString + "]\t"+ cost+ "\t"+alignmentString;
+		String logString = motTest + "\t["+phonesTestString+"]\t"+ motReconnu + "\t[" + phonesReconnuString + "]\t"+ cost+ "\t"+alignmentString+"\n";
 		filewriter.write(logString);
 	}
 

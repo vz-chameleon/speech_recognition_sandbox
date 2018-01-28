@@ -12,30 +12,23 @@ import java.util.AbstractMap.SimpleEntry;;
 
 public class DataParser {
 
-	public DataParser(){
-
-	}
-
-	public ArrayList<SimpleEntry<String,String[]>> loadLexicFile(String filepath) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(filepath));
-		ArrayList<SimpleEntry<String,String[]>> LexicPhonemsAList = new ArrayList<>();
+	
+	public static void reco_dist_levenshtein(String lex, String test) throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader(lex));
+		HashMap<String,String[]> LexicPhonemsAList = new  HashMap<String,String[]>();
 		
 		String line;
 		while ((line = br.readLine()) != null) {
-			String split[]= line.split("\t"); // split[1] = "Mozart," so you may need to do a little more work there
+			String split[]= line.split("\t");
 			String word = split[0];
 			String[] phonems = split[1].split(" ");
-			LexicPhonemsAList.add(new SimpleEntry<String,String[]>(word,phonems));
+			LexicPhonemsAList.put(word,phonems);
 		}
 		br.close();
-		return LexicPhonemsAList;
-	}
-	
-	public void checkTestFile(String filepath, ArrayList<SimpleEntry<String,String[]>> LexicPhonemsAList) throws IOException{
-		BufferedReader br = new BufferedReader(new FileReader(filepath));
-		BufferedWriter bw = new BufferedWriter(new FileWriter(filepath+".testLog"));
 		
-		String line;
+		
+		br = new BufferedReader(new FileReader(test));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(test+".testLog"));
 		while ((line = br.readLine()) != null) {
 	
 			String split[]= line.split("\t");
@@ -43,9 +36,10 @@ public class DataParser {
 			String[] testphonems = split[1].split(" ");
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
-			SimpleEntry<String, SimpleEntry<String[],Double>> result  = getrecognisedWordwithPhonemsAndCost(testphonems,LexicPhonemsAList);
+			SimpleEntry<String, SimpleEntry<String[],Double>> result  = getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsAList);
 			String recognisedWord = result.getKey();
-			String[] recognisedWordphonems = result.getValue().getKey();
+			String[] recognisedWordphonems = LexicPhonemsAList.get(recognisedWord);
+			String[] agitlignment = result.getValue().getKey();
 			double cost = result.getValue().getValue();
 			
 //			log this to file
@@ -55,15 +49,26 @@ public class DataParser {
 		bw.close();
 	}
 	
-	public SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithPhonemsAndCost(String[] testphonems,ArrayList<SimpleEntry<String,String[]>> LexicPhonemsAList){
+	public static SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithAlignmentAndCost(String[] testphonems,HashMap<String, String[]> LexicPhonemsAList){
 		//TODO
 		return null;
 		
 	}
 
-	
-	public void logtofile(Writer filewriter, String motTest, String[] phonesTest, String motReconnu){
-//		log this to file : <mot test> [phones test]  <mot reconnu> [phones ref] ok/err cout align
+	/**
+	 * log this to file : <mot test> [phones test]  <mot reconnu> [phones ref] ok/err cout align
+	 * 
+	 * @param filewriter Object to write to log file
+	 * @param motTest The tested word
+	 * @param phonesTest The tested word's recorded pronunciation
+	 * @param motReconnu The recognized word from those sounds
+	 * @param phonesReconnu The recognized word true pronunciation
+	 * @param cost The Levenshtein cost to go from phonesTest to phonesReconnu
+	 * @throws IOException
+	 */
+	public void logtofile(Writer filewriter, String motTest, String[] phonesTest, String motReconnu, String[] phonesReconnu, double cost) throws IOException{
+		String logString = motTest + " ["+phonesTest+"] "+ motReconnu + " [" + phonesReconnu + "] "+ cost;
+		filewriter.write(logString);
 	}
 
 	/**

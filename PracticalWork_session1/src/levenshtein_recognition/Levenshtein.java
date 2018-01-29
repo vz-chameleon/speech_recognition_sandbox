@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 public class Levenshtein {
 	public static double coutInsertion = 1.;
@@ -193,5 +195,24 @@ public class Levenshtein {
 		}
 		Collections.reverse(optimalTransformationString);
 		return (String[]) optimalTransformationString.toArray(new String[optimalTransformationString.size()]);
+	}
+	
+	public static SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithAlignmentAndCost(String[] testphonems,HashMap<String, String[]> LexicPhonemsAList){		
+		double cost = Double.MAX_VALUE;
+		String closestWord = null;
+		String[] closestAlignment= null;
+		for (Entry<String, String[]> word_phonems_entry : LexicPhonemsAList.entrySet()) {
+			String[] lexphonems = word_phonems_entry.getValue();
+			char[][] tempPath = new char[testphonems.length+1][lexphonems.length+1];
+			double tempCost = Levenshtein.levenshteinDistance(testphonems, lexphonems, tempPath);
+			
+			if (cost>tempCost) {
+				cost = tempCost;
+				closestWord = word_phonems_entry.getKey();
+				closestAlignment = Levenshtein.optimalTransformationsDisplayableStringArray(tempPath, testphonems, lexphonems);
+			}
+		}	
+		return new SimpleEntry<String, SimpleEntry<String[],Double>>(closestWord, new SimpleEntry<>(closestAlignment, cost));
+		
 	}
 }

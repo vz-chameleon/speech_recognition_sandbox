@@ -19,7 +19,7 @@ public class MainLevenshteinRecognition {
 		
 		String line;	
 		BufferedReader br = new BufferedReader(new FileReader(test));
-		BufferedWriter bw = new BufferedWriter(new FileWriter(test+".testLog"));
+		BufferedWriter bw = new BufferedWriter(new FileWriter(test+".LEVENSHTEIN__testLog"));
 		while ((line = br.readLine()) != null) {
 	
 			String split[]= line.split("\t");
@@ -28,7 +28,7 @@ public class MainLevenshteinRecognition {
 			String[] testphonems = (split.length==2)?split[1].split(" "): new String[] {"unknown"};
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
-			SimpleEntry<String, SimpleEntry<String[],Double>> result  = getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
+			SimpleEntry<String, SimpleEntry<String[],Double>> result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
 			String recognisedWord = result.getKey();
 			String[] recognisedWordphonems = LexicPhonemsHashmap.get(recognisedWord);
 			String[] alignment = result.getValue().getKey();
@@ -41,24 +41,7 @@ public class MainLevenshteinRecognition {
 		bw.close();
 	}
 	
-	public static SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithAlignmentAndCost(String[] testphonems,HashMap<String, String[]> LexicPhonemsAList){		
-		double cost = Double.MAX_VALUE;
-		String closestWord = null;
-		String[] closestAlignment= null;
-		for (Entry<String, String[]> word_phonems_entry : LexicPhonemsAList.entrySet()) {
-			String[] lexphonems = word_phonems_entry.getValue();
-			char[][] tempPath = new char[testphonems.length+1][lexphonems.length+1];
-			double tempCost = Levenshtein.levenshteinDistance(testphonems, lexphonems, tempPath);
-			
-			if (cost>tempCost) {
-				cost = tempCost;
-				closestWord = word_phonems_entry.getKey();
-				closestAlignment = Levenshtein.optimalTransformationsDisplayableStringArray(tempPath, testphonems, lexphonems);
-			}
-		}	
-		return new SimpleEntry<String, SimpleEntry<String[],Double>>(closestWord, new SimpleEntry<>(closestAlignment, cost));
-		
-	}
+	
 	
 	/**
 	 * @param args

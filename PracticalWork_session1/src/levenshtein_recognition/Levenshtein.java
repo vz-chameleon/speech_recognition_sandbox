@@ -22,10 +22,13 @@ public class Levenshtein {
 		if (coutSubstitutionMap == null) {
 			return (c1.equals(c2))?0.:1.;
 		}else
-			return coutSubstitutionMap.get(c1).get(c2);
-
+			try {
+				return coutSubstitutionMap.get(c1).get(c2);
+			} catch (Exception e) {
+				return 1.;
+			}
 	}
-	
+
 	private static double  coutInsertion(Object[] seq, int i) {
 		if (i<0)
 			return Double.MAX_VALUE;
@@ -33,10 +36,14 @@ public class Levenshtein {
 		if (coutSubstitutionMap == null) {
 			return 1.;
 		}else
-			return coutInsertionMap.get(c);
+			try {
+				return coutInsertionMap.get(c);
+			} catch (Exception e) {
+				return 1.;
+			}
 
 	}
-	
+
 	private static double  coutOmission(Object[] seq, int i) {
 		if (i<0)
 			return Double.MAX_VALUE;
@@ -44,8 +51,11 @@ public class Levenshtein {
 		if (coutSubstitutionMap == null) {
 			return 1.;
 		}else
-			return coutOmissionMap.get(c);
-
+			try {
+				return coutOmissionMap.get(c);
+			} catch (Exception e) {
+				return 1.;
+			}
 	}
 
 
@@ -91,7 +101,7 @@ public class Levenshtein {
 				optimalTransformation.add('s');
 				System.out.println("i,j = "+i+","+j+"   ...... 's'");
 				i-=1;j-=1;
-				
+
 				if (i==0 & j==-1)
 					j++;
 				else if (j==0 & i==-1)
@@ -196,7 +206,7 @@ public class Levenshtein {
 		Collections.reverse(optimalTransformationString);
 		return (String[]) optimalTransformationString.toArray(new String[optimalTransformationString.size()]);
 	}
-	
+
 	public static SimpleEntry<String, SimpleEntry<String[], Double>> getrecognisedWordwithAlignmentAndCost(String[] testphonems,HashMap<String, String[]> LexicPhonemsAList){		
 		double cost = Double.MAX_VALUE;
 		String closestWord = null;
@@ -205,7 +215,7 @@ public class Levenshtein {
 			String[] lexphonems = word_phonems_entry.getValue();
 			char[][] tempPath = new char[testphonems.length+1][lexphonems.length+1];
 			double tempCost = Levenshtein.levenshteinDistance(testphonems, lexphonems, tempPath);
-			
+
 			if (cost>tempCost) {
 				cost = tempCost;
 				closestWord = word_phonems_entry.getKey();
@@ -213,6 +223,6 @@ public class Levenshtein {
 			}
 		}	
 		return new SimpleEntry<String, SimpleEntry<String[],Double>>(closestWord, new SimpleEntry<>(closestAlignment, cost));
-		
+
 	}
 }

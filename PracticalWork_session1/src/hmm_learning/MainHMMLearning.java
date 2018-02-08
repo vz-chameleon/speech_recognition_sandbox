@@ -2,6 +2,7 @@ package hmm_learning;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -13,8 +14,8 @@ import utils.DataParser;
 public class MainHMMLearning {
 	
 	
-	private static int[][] n_align_matrix; //Matrix to count the number of times the phoneme of reference is aligned to the phoneme test
-	private static int[] n_ins_vector; 	   // Vector containing the number of times the test phoneme is inserted into a sequence
+	private static HashMap<String, HashMap<String, Integer>> n_align_matrix; //Matrix to count the number of times the phoneme of reference is aligned to the phoneme test
+	private static HashMap<String, Integer> n_ins_vector; 				   // Vector containing the number of times the test phoneme is inserted into a sequence
 	
 	private static int n_substitutions = 0; //Global number of substitutions
 	private static int n_omissions = 0;     //Global number of omissions
@@ -32,15 +33,32 @@ public class MainHMMLearning {
 					
 					// If the first term is nothing, we have an insertion
 					if (m.group(1).equals("")){
-						n_insertions++;
-						System.out.println("An insertion was made !");
+						
+						//Update global number of insertions
+						n_insertions++; 
+						
+						// Update insertion counter for inserted phoneme
+						int count = n_ins_vector.get(m.group(2));
+						n_ins_vector.put(m.group(2), count+1);
+						
+//						System.out.println("An insertion was made !");
 					}
 					else if (m.group(2).equals("")){
-						n_omissions++;
-						System.out.println("An omission was made !");
+						
+						//Update global number of omissions
+						n_omissions++;						
+//						System.out.println("An omission was made !");
 					}
 					else{
+						//Update global number of substitutions
 						n_substitutions++;
+						
+						//Update alignment matrix : (a => b)
+						
+						// Get hashmap for phoneme 'a', the get the value of alignment for phoneme 'b' in that map
+						int count = n_align_matrix.get(m.group(1)).get(m.group(2)); 
+						n_align_matrix.get(m.group(1)).put(m.group(2), count+1);
+						
 						System.out.println("A substitution was made !");
 					}
 				}
@@ -48,7 +66,13 @@ public class MainHMMLearning {
 					System.err.println("In Levenshtein's result there is a string beginning with '(' but not matching '(. => .)' !!");
 			}
 			else{
-				//Update in the diagonal
+				//Update global number of substitutions
+				n_substitutions++;
+				
+				int count = n_align_matrix.get(suggested_transformation).get(suggested_transformation); 
+				n_align_matrix.get(suggested_transformation).put(suggested_transformation, count+1);
+				
+				System.out.println("It's the same phoneme !");
 			}
 		}
 		
@@ -59,12 +83,19 @@ public class MainHMMLearning {
 		// The list of phonem hashmaps parsed from the initial model
 		HashMap[] HMMMaps_init_model  = DataParser.load_HMMMaps(modeleHMM_init);
 		
+		//Initialize the structures for counting occurrences of insertions and phonem alignments
+		n_ins_vector = DataParser.create_empty_hashmap_for_phoneme_occurrence();
+		n_align_matrix = DataParser.create_empty_hashmap_matrix_of_phoneme_alignment();
+		
 		// A hashmap containing (reference,test) phonems list
 		HashMap<String[],String[]> trainPhonemsHashmap  = DataParser.train_to_Hashmap(donnees_app);
 		
 		// For each example in train data
 		for (String[] ref_phonemes : trainPhonemsHashmap.keySet()){
 			String[] test_phonemes = trainPhonemsHashmap.get(ref_phonemes);
+			
+			System.out.println("Reference phonemes : "+Arrays.deepToString(ref_phonemes) + " | test_phonemes : "+Arrays.deepToString(test_phonemes));
+			
 			char[][] tempPath = new char[test_phonemes.length+1][ref_phonemes.length+1];
 			double tempCost = Levenshtein.levenshteinDistance(test_phonemes, ref_phonemes, tempPath);
 			
@@ -86,8 +117,6 @@ public class MainHMMLearning {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-
 	}
 
 }

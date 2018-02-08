@@ -2,6 +2,7 @@ package utils;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
@@ -71,6 +72,10 @@ public class DataParser {
 	}
 
 	
+	// ==================================================================================================================
+	// ============================ Parsers and other utils for learning and traind data ================================
+	// ==================================================================================================================
+	
 	/**
 	 * A function to parse train data files into Hashmaps representing the reference phoneme list paired to the tested phoneme list
 	 * @param train_data : the file containing training data
@@ -97,6 +102,53 @@ public class DataParser {
 		
 		return Ref_test_PhonemsHashmap;
 	}
+	
+	/**
+	 * A function to create an empty hashmap of phoneme occurrences. All available phonemes are loaded from the symbol list file
+	 * @return HashMap<String, Integer> - A hashmap with all the possible phoneme symbols, associated to a frequency of occurrence at 0
+	 * @throws IOException
+	 */
+	public static HashMap<String, Integer> create_empty_hashmap_for_phoneme_occurrence() throws IOException{
+		HashMap<String, Integer> phonem_occurrence = new HashMap<>();
+		
+		// Load symbols list data file
+		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String phonem = split[0]; 
+			phonem_occurrence.put(phonem, 0);
+		}
+		br.close();
+		
+		return phonem_occurrence;
+	}
+	
+	/**
+	 * A function to create an empty hashmap of hashmaps for phonemes alignement. 
+	 * Key : the phoneme's symbol, Value : result of function 'create_empty_hashmap_for_phoneme_occurrence()'
+	 * @return
+	 * @throws IOException
+	 */
+	
+	public static HashMap<String, HashMap<String, Integer>> create_empty_hashmap_matrix_of_phoneme_alignment() throws IOException{
+		HashMap<String, HashMap<String, Integer>> phonem_occurrence = new HashMap<>();
+		
+		// Load symbols list data file
+		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String phonem = split[0]; 
+			phonem_occurrence.put(phonem, create_empty_hashmap_for_phoneme_occurrence()); 
+		}
+		br.close();
+		
+		return phonem_occurrence;
+	}
+	
+	
+	// ==================================================================================================================
 
 
 	/**

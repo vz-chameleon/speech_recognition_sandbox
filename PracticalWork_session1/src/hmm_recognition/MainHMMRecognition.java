@@ -19,7 +19,7 @@ public class MainHMMRecognition {
 	
 	
 	public static void reco_HMM_discret(File lex,File modeleHMM, File test) throws IOException{
-		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.tex_or_test_to_HashMap(lex);
+		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
 		
 		HashMap[] HMMMaps  = DataParser.load_HMMMaps(modeleHMM);
 		

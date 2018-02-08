@@ -9,14 +9,13 @@ import java.util.HashMap;
 
 public class DataParser {
 	
-	
 	/**
 	 * Loads a .lex or a .test file into a <{@code HashMap<String,String[]>} 
 	 * @param lex : the file to load into a HashMap
 	 * @return a {@code HashMap<String,String[]>} linking each word (the {@code String}) of the file (<b>lex</b>) and the corresponding array of phonemes ({@code String[]}
 	 * @throws IOException when fails to parse the file properly
 	 */
-	public static HashMap<String,String[]> tex_or_test_to_HashMap(File lex) throws IOException {
+	public static HashMap<String,String[]> lex_or_test_to_HashMap(File lex) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> WordPhonemsHashmap = new  HashMap<String,String[]>();
 		
@@ -77,6 +76,84 @@ public class DataParser {
 		return new HashMap[] {PSIOLogs, SubstitutionLogsMap, InsertionLogsMap} ;
 	}
 
+	
+	// ==================================================================================================================
+	// ============================ Parsers and other utils for learning and traind data ================================
+	// ==================================================================================================================
+	
+	/**
+	 * A function to parse train data files into Hashmaps representing the reference phoneme list paired to the tested phoneme list
+	 * @param train_data : the file containing training data
+	 * @return HashMap<String[],String[]> : pairs of (reference, test) phonemes lists
+	 * @throws IOException
+	 */
+	public static HashMap<String[],String[]> train_to_Hashmap(File train_data) throws IOException {
+		
+		// Load train data file
+		BufferedReader br = new BufferedReader(new FileReader(train_data));
+		
+		// For train data, there is no need to keep the word as a key, here the key is the expected list of phonems (reference) and value is the test list of phonems
+		HashMap<String[],String[]> Ref_test_PhonemsHashmap = new  HashMap<String[],String[]>();
+		
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String word = split[0]; // Not used here
+			String[] ref_phonems = split[1].replace("[", "").replace("]", "").split(" ");
+			String[] test_phonems = split[2].replace("[", "").replace("]", "").split(" ");
+			Ref_test_PhonemsHashmap.put(ref_phonems,test_phonems);
+		}
+		br.close();
+		
+		return Ref_test_PhonemsHashmap;
+	}
+	
+	/**
+	 * A function to create an empty hashmap of phoneme occurrences. All available phonemes are loaded from the symbol list file
+	 * @return HashMap<String, Integer> - A hashmap with all the possible phoneme symbols, associated to a frequency of occurrence at 0
+	 * @throws IOException
+	 */
+	public static HashMap<String, Integer> create_empty_hashmap_for_phoneme_occurrence() throws IOException{
+		HashMap<String, Integer> phonem_occurrence = new HashMap<>();
+		
+		// Load symbols list data file
+		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String phonem = split[0]; 
+			phonem_occurrence.put(phonem, 0);
+		}
+		br.close();
+		
+		return phonem_occurrence;
+	}
+	
+	/**
+	 * A function to create an empty hashmap of hashmaps for phonemes alignement. 
+	 * Key : the phoneme's symbol, Value : result of function 'create_empty_hashmap_for_phoneme_occurrence()'
+	 * @return
+	 * @throws IOException
+	 */
+	
+	public static HashMap<String, HashMap<String, Integer>> create_empty_hashmap_matrix_of_phoneme_alignment() throws IOException{
+		HashMap<String, HashMap<String, Integer>> phonem_occurrence = new HashMap<>();
+		
+		// Load symbols list data file
+		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String phonem = split[0]; 
+			phonem_occurrence.put(phonem, create_empty_hashmap_for_phoneme_occurrence()); 
+		}
+		br.close();
+		
+		return phonem_occurrence;
+	}
+	
+	
+	// ==================================================================================================================
 
 
 	/**
@@ -119,7 +196,6 @@ public class DataParser {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 	}
 }

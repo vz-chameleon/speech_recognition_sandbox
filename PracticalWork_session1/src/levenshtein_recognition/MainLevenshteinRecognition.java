@@ -15,7 +15,7 @@ import utils.DataParser;
 public class MainLevenshteinRecognition {	
 	
 	public static void reco_dist_levenshtein(File lex, File test) throws IOException{
-		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.tex_or_test_to_HashMap(lex);
+		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
 		
 		String line;	
 		BufferedReader br = new BufferedReader(new FileReader(test));

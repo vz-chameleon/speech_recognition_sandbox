@@ -9,6 +9,13 @@ import java.util.HashMap;
 
 public class DataParser {
 	
+	
+	/**
+	 * Loads a .lex or a .test file into a <{@code HashMap<String,String[]>} 
+	 * @param lex : the file to load into a HashMap
+	 * @return a {@code HashMap<String,String[]>} linking each word (the {@code String}) of the file (<b>lex</b>) and the corresponding array of phonemes ({@code String[]}
+	 * @throws IOException when fails to parse the file properly
+	 */
 	public static HashMap<String,String[]> tex_or_test_to_HashMap(File lex) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> WordPhonemsHashmap = new  HashMap<String,String[]>();

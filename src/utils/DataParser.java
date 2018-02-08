@@ -1,8 +1,10 @@
 package utils;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
@@ -103,7 +105,7 @@ public class DataParser {
 			String[] test_phonems = split[2].replace("[", "").replace("]", "").split(" ");
 			Ref_test_PhonemsHashmap.put(ref_phonems,test_phonems);
 		}
-		br.close();
+		br.close(); 
 		
 		return Ref_test_PhonemsHashmap;
 	}
@@ -113,8 +115,8 @@ public class DataParser {
 	 * @return HashMap<String, Integer> - A hashmap with all the possible phoneme symbols, associated to a frequency of occurrence at 0
 	 * @throws IOException
 	 */
-	public static HashMap<String, Integer> create_empty_hashmap_for_phoneme_occurrence() throws IOException{
-		HashMap<String, Integer> phonem_occurrence = new HashMap<>();
+	public static <V> HashMap<String, V> create_empty_hashmap_for_phoneme_occurrence(V value) throws IOException{
+		HashMap<String, V> phonem_occurrence = new HashMap<>();
 		
 		// Load symbols list data file
 		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
@@ -122,7 +124,7 @@ public class DataParser {
 		while ((line = br.readLine()) != null) {
 			String split[]= line.split("\t");
 			String phonem = split[0]; 
-			phonem_occurrence.put(phonem, 0);
+			phonem_occurrence.put(phonem, value);
 		}
 		br.close();
 		
@@ -136,8 +138,8 @@ public class DataParser {
 	 * @throws IOException
 	 */
 	
-	public static HashMap<String, HashMap<String, Integer>> create_empty_hashmap_matrix_of_phoneme_alignment() throws IOException{
-		HashMap<String, HashMap<String, Integer>> phonem_occurrence = new HashMap<>();
+	public static <V> HashMap<String, HashMap<String, V>> create_empty_hashmap_matrix_of_phoneme_alignment(V value) throws IOException{
+		HashMap<String, HashMap<String, V>> phonem_occurrence = new HashMap<>();
 		
 		// Load symbols list data file
 		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
@@ -145,11 +147,69 @@ public class DataParser {
 		while ((line = br.readLine()) != null) {
 			String split[]= line.split("\t");
 			String phonem = split[0]; 
-			phonem_occurrence.put(phonem, create_empty_hashmap_for_phoneme_occurrence()); 
+			phonem_occurrence.put(phonem, create_empty_hashmap_for_phoneme_occurrence(value)); 
 		}
 		br.close();
 		
 		return phonem_occurrence;
+	}
+	
+	public static String[] load_phoneme_symbols_as_list() throws IOException{
+		BufferedReader br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line;
+		int line_nb=0;
+		while ((line = br.readLine()) != null) {
+			line_nb++;
+		}
+		br.close();
+		
+		String[] phoneme_list = new String[line_nb];
+		int i=0;
+		br = new BufferedReader(new FileReader(new File("resources/Master-Audition-TD-2018.01-data-v1.0/liste_symboles.dat")));
+		String line2;
+		while ((line2 = br.readLine()) != null) {
+			String split[]= line2.split("\t");
+			phoneme_list[i]=split[0]; 
+			i++;
+		}
+		br.close();
+		
+		return phoneme_list;
+	}
+	
+	public static void export_trained_model_to_file(Double p_sub, Double p_ins, Double p_omi, HashMap<String, Double> p_insertion, HashMap<String, HashMap<String, Double>> p_alignment,String output_path) throws IOException{
+		Writer filewriter = new BufferedWriter(new FileWriter(output_path));
+		filewriter.write("Psub;Pins;Pomi \n");
+		filewriter.write(""+p_sub+";"+p_ins+";"+p_omi+"\n");
+		filewriter.write("#Une ligne par symbole de reference; une colonne par symbole de test \n");
+		
+		StringBuilder sb = new StringBuilder("  ");
+		for (String symbol : DataParser.load_phoneme_symbols_as_list())
+			sb.append(";"+symbol);
+		
+		filewriter.write(sb.toString()+"\n");
+		
+		String[] phoneme_symbol_list = DataParser.load_phoneme_symbols_as_list();
+		
+		for (String symbol : phoneme_symbol_list){
+			sb = new StringBuilder(symbol);
+			
+			HashMap<String, Double> alignment_map_for_ref_phoneme = p_alignment.get(symbol);
+			for (String test_phoneme_symbol : phoneme_symbol_list)	
+				sb.append(";"+alignment_map_for_ref_phoneme.get(test_phoneme_symbol));
+		
+			filewriter.write(sb.toString()+"\n");
+			
+		}
+		
+		filewriter.write("Proba insertions...\n");
+		sb = new StringBuilder("<ins>");
+		for (String symbol : phoneme_symbol_list)
+			sb.append(";"+p_insertion.get(symbol));
+		
+		filewriter.write(sb.toString());
+		filewriter.flush();
+		filewriter.close();
 	}
 	
 	

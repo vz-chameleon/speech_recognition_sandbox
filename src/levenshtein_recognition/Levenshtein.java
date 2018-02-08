@@ -4,8 +4,12 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.io.File;
+import java.io.IOException;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
+
+import utils.DataParser;
 
 public class Levenshtein {
 	public static double coutInsertion = 1.;
@@ -225,4 +229,42 @@ public class Levenshtein {
 		return new SimpleEntry<String, SimpleEntry<String[],Double>>(closestWord, new SimpleEntry<>(closestAlignment, cost));
 
 	}
+	
+	/**
+	 * Initialise Levenshtein's costs using the log of transition probabilities of a Hidden Markov Model
+	 * @param HMM_model_file
+	 * @throws NumberFormatException
+	 * @throws IOException
+	 */
+	public static void initialise_with_HMM_model_costs(File HMM_model_file) throws NumberFormatException, IOException{
+		
+		// The list of phonem hashmaps parsed from the initial model
+		HashMap[] HMMMaps  = DataParser.load_HMMMaps(HMM_model_file);
+		
+		HashMap<String, Double> PSIOLogs = HMMMaps[0];
+		Double PsubLog = PSIOLogs.get("PsubLog");
+		Double PinsLog = PSIOLogs.get("PinsLog");
+		Double PomiLog = PSIOLogs.get("PomiLog");		
+		HashMap<String, HashMap<String, Double>> SubstitutionLogsMap = HMMMaps[1];
+		HashMap<String, Double> InsertionLogsMap = HMMMaps[2];
+		
+		HashMap<Object, Double> coutInsertionMap = new HashMap<>();
+		HashMap<Object, HashMap<Object, Double>> coutSubstitutionMap = new HashMap<>();
+		HashMap<Object, Double> coutOmissionMap = new HashMap<>();
+		
+		for (String phonem : InsertionLogsMap.keySet()) {
+			coutInsertionMap.put(phonem, -PsubLog-InsertionLogsMap.get(phonem));
+			coutOmissionMap.put(phonem, -PomiLog);
+			HashMap<Object, Double> cs = new HashMap<>();
+			for (String phonem2 : InsertionLogsMap.keySet()) {
+				cs.put(phonem2, -PinsLog-SubstitutionLogsMap.get(phonem).get(phonem2));
+			}
+			coutSubstitutionMap.put(phonem, cs);
+		}
+		
+		Levenshtein.coutInsertionMap=coutInsertionMap;
+		Levenshtein.coutOmissionMap=coutOmissionMap;
+		Levenshtein.coutSubstitutionMap=coutSubstitutionMap;
+	}
+
 }

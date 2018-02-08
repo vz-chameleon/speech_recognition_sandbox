@@ -21,34 +21,7 @@ public class MainHMMRecognition {
 	public static void reco_HMM_discret(File lex,File modeleHMM, File test) throws IOException{
 		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
 		
-		HashMap[] HMMMaps  = DataParser.load_HMMMaps(modeleHMM);
-		
-		
-		HashMap<String, Double> PSIOLogs = HMMMaps[0];
-		Double PsubLog = PSIOLogs.get("PsubLog");
-		Double PinsLog = PSIOLogs.get("PinsLog");
-		Double PomiLog = PSIOLogs.get("PomiLog");		
-		HashMap<String, HashMap<String, Double>> SubstitutionLogsMap = HMMMaps[1];
-		HashMap<String, Double> InsertionLogsMap = HMMMaps[2];
-		
-		HashMap<Object, Double> coutInsertionMap = new HashMap<>();
-		HashMap<Object, HashMap<Object, Double>> coutSubstitutionMap = new HashMap<>();
-		HashMap<Object, Double> coutOmissionMap = new HashMap<>();
-		
-		for (String phonem : InsertionLogsMap.keySet()) {
-			coutInsertionMap.put(phonem, -PsubLog-InsertionLogsMap.get(phonem));
-			coutOmissionMap.put(phonem, -PomiLog);
-			HashMap<Object, Double> cs = new HashMap<>();
-			for (String phonem2 : InsertionLogsMap.keySet()) {
-				cs.put(phonem2, -PinsLog-SubstitutionLogsMap.get(phonem).get(phonem2));
-			}
-			coutSubstitutionMap.put(phonem, cs);
-		}
-		
-		Levenshtein.coutInsertionMap=coutInsertionMap;
-		Levenshtein.coutOmissionMap=coutOmissionMap;
-		Levenshtein.coutSubstitutionMap=coutSubstitutionMap;
-		
+		//Levenshtein.initialise_with_HMM_model_costs(modeleHMM);
 
 		String line;	
 		BufferedReader br = new BufferedReader(new FileReader(test));

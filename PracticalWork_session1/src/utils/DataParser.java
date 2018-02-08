@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class DataParser {
 	
-	public static HashMap<String,String[]> tex_or_test_to_HashMap(File lex) throws IOException {
+	public static HashMap<String,String[]> lex_or_test_to_HashMap(File lex) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lex));
 		HashMap<String,String[]> WordPhonemsHashmap = new  HashMap<String,String[]>();
 		
@@ -70,6 +70,33 @@ public class DataParser {
 		return new HashMap[] {PSIOLogs, SubstitutionLogsMap, InsertionLogsMap} ;
 	}
 
+	
+	/**
+	 * A function to parse train data files into Hashmaps representing the reference phoneme list paired to the tested phoneme list
+	 * @param train_data : the file containing training data
+	 * @return HashMap<String[],String[]> : pairs of (reference, test) phonemes lists
+	 * @throws IOException
+	 */
+	public static HashMap<String[],String[]> train_to_Hashmap(File train_data) throws IOException {
+		
+		// Load train data file
+		BufferedReader br = new BufferedReader(new FileReader(train_data));
+		
+		// For train data, there is no need to keep the word as a key, here the key is the expected list of phonems (reference) and value is the test list of phonems
+		HashMap<String[],String[]> Ref_test_PhonemsHashmap = new  HashMap<String[],String[]>();
+		
+		String line;
+		while ((line = br.readLine()) != null) {
+			String split[]= line.split("\t");
+			String word = split[0]; // Not used here
+			String[] ref_phonems = split[1].replace("[", "").replace("]", "").split(" ");
+			String[] test_phonems = split[2].replace("[", "").replace("]", "").split(" ");
+			Ref_test_PhonemsHashmap.put(ref_phonems,test_phonems);
+		}
+		br.close();
+		
+		return Ref_test_PhonemsHashmap;
+	}
 
 
 	/**
@@ -112,7 +139,6 @@ public class DataParser {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
 
 	}
 }

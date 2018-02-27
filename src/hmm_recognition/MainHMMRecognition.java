@@ -7,10 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 
 import levenshtein_recognition.Levenshtein;
 
 import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 
 import utils.DataParser;
 
@@ -19,7 +22,7 @@ public class MainHMMRecognition {
 	
 	
 	public static void reco_HMM_discret(File lex,File modeleHMM, File test) throws IOException{
-		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
+		List<Entry<String,String[]>> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
 		
 		//Levenshtein.initialise_with_HMM_model_costs(modeleHMM);
 
@@ -34,11 +37,12 @@ public class MainHMMRecognition {
 			String[] testphonems = (split.length==2)?split[1].split(" "): new String[] {"unknown"};
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
-			SimpleEntry<String, SimpleEntry<String[],Double>> result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
-			String recognisedWord = result.getKey();
-			String[] recognisedWordphonems = LexicPhonemsHashmap.get(recognisedWord);
-			String[] alignment = result.getValue().getKey();
-			double cost = result.getValue().getValue();
+//			SimpleEntry<String, SimpleEntry<String[],Double>> result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
+			Object[] result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
+			String recognisedWord = (String) result[0];
+			String[] recognisedWordphonems = (String[]) result[1];
+			String[] alignment = (String[]) result[2];
+			double cost = (double) result[3];
 			
 //			log this to file
 			DataParser.logtofile(bw, testword, testphonems, recognisedWord, recognisedWordphonems, cost, alignment);

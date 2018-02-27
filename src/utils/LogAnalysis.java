@@ -98,10 +98,10 @@ public class LogAnalysis {
 	}
 	
 	public static void main(String[] args) throws Exception {
-		File logfile2 = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-1syll-0100words.test.HMMDISCRET__testLog");
-		printStats(logfile2);
+//		File logfile2 = new File("resources/Master-Audition-TD-2018.01-data-v1.0/test-1syll-0100words.test.HMMDISCRET__testLog");
+//		printStats(logfile2);
 		
-		analyseAllLogs("HMMDISCRET__testLog","resources/Master-Audition-TD-2018.01-data-v1.0");
+//		analyseAllLogs("HMMDISCRET__testLog","resources/Master-Audition-TD-2018.01-data-v1.0");
 		
 		analyseAllLogs("LEVENSHTEIN__testLog","resources/Master-Audition-TD-2018.01-data-v1.0");
 

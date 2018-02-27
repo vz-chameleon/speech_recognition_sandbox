@@ -7,7 +7,13 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.util.AbstractMap;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Set;
 
 public class DataParser {
 	
@@ -17,16 +23,16 @@ public class DataParser {
 	 * @return a {@code HashMap<String,String[]>} linking each word (the {@code String}) of the file (<b>lex</b>) and the corresponding array of phonemes ({@code String[]}
 	 * @throws IOException when fails to parse the file properly
 	 */
-	public static HashMap<String,String[]> lex_or_test_to_HashMap(File lex) throws IOException {
+	public static List<Entry<String,String[]>> lex_or_test_to_HashMap(File lex) throws IOException {
 		BufferedReader br = new BufferedReader(new FileReader(lex));
-		HashMap<String,String[]> WordPhonemsHashmap = new  HashMap<String,String[]>();
+		List<Entry<String,String[]>> WordPhonemsHashmap = new  ArrayList<Entry<String,String[]>>();
 		
 		String line;
 		while ((line = br.readLine()) != null) {
 			String split[]= line.split("\t");
 			String word = split[0];
 			String[] phonems = split[1].split(" ");
-			WordPhonemsHashmap.put(word,phonems);
+			WordPhonemsHashmap.add(new AbstractMap.SimpleEntry(word,phonems));
 		}
 		br.close();
 		
@@ -89,13 +95,12 @@ public class DataParser {
 	 * @return HashMap<String[],String[]> : pairs of (reference, test) phonemes lists
 	 * @throws IOException
 	 */
-	public static HashMap<String[],String[]> train_to_Hashmap(File train_data) throws IOException {
-		
+	public static List<Entry<String[],String[]>> train_to_List(File train_data) throws IOException {		
 		// Load train data file
 		BufferedReader br = new BufferedReader(new FileReader(train_data));
 		
 		// For train data, there is no need to keep the word as a key, here the key is the expected list of phonems (reference) and value is the test list of phonems
-		HashMap<String[],String[]> Ref_test_PhonemsHashmap = new  HashMap<String[],String[]>();
+		List<Entry<String[],String[]>> Ref_test_PhonemsSet = new ArrayList<Entry<String[],String[]>>();
 		
 		String line;
 		while ((line = br.readLine()) != null) {
@@ -103,11 +108,11 @@ public class DataParser {
 			String word = split[0]; // Not used here
 			String[] ref_phonems = split[1].replace("[", "").replace("]", "").split(" ");
 			String[] test_phonems = split[2].replace("[", "").replace("]", "").split(" ");
-			Ref_test_PhonemsHashmap.put(ref_phonems,test_phonems);
+			Ref_test_PhonemsSet.add(new AbstractMap.SimpleEntry(ref_phonems,test_phonems));
 		}
 		br.close(); 
 		
-		return Ref_test_PhonemsHashmap;
+		return Ref_test_PhonemsSet;
 	}
 	
 	/**

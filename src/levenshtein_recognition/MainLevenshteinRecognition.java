@@ -7,6 +7,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.Map.Entry;
 import java.util.AbstractMap.SimpleEntry;
 
@@ -15,8 +17,7 @@ import utils.DataParser;
 public class MainLevenshteinRecognition {	
 	
 	public static void reco_dist_levenshtein(File lex, File test) throws IOException{
-		HashMap<String,String[]> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
-		
+		List<Entry<String,String[]>> LexicPhonemsHashmap  = DataParser.lex_or_test_to_HashMap(lex);
 		String line;	
 		BufferedReader br = new BufferedReader(new FileReader(test));
 		BufferedWriter bw = new BufferedWriter(new FileWriter(test+".LEVENSHTEIN__testLog"));
@@ -28,12 +29,16 @@ public class MainLevenshteinRecognition {
 			String[] testphonems = (split.length==2)?split[1].split(" "): new String[] {"unknown"};
 			
 //			Call function to test out testword's phonem with our LexicPhonemsAList
-			SimpleEntry<String, SimpleEntry<String[],Double>> result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
-			String recognisedWord = result.getKey();
-			String[] recognisedWordphonems = LexicPhonemsHashmap.get(recognisedWord);
-			String[] alignment = result.getValue().getKey();
-			double cost = result.getValue().getValue();
-			
+//			SimpleEntry<String, SimpleEntry<String[],Double>> result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
+//			String recognisedWord = result.getKey();
+//			String[] recognisedWordphonems = LexicPhonemsHashmap.get(recognisedWord);
+//			String[] alignment = result.getValue().getKey();
+//			double cost = result.getValue().getValue();
+			Object[] result  = Levenshtein.getrecognisedWordwithAlignmentAndCost(testphonems,LexicPhonemsHashmap);
+			String recognisedWord = (String) result[0];
+			String[] recognisedWordphonems = (String[]) result[1];
+			String[] alignment = (String[]) result[2];
+			double cost = (double) result[3];			
 //			log this to file
 			DataParser.logtofile(bw, testword, testphonems, recognisedWord, recognisedWordphonems, cost, alignment);
 		}

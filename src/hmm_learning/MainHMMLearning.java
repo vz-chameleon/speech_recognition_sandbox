@@ -4,6 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -101,12 +104,13 @@ public class MainHMMLearning {
 		p_testPhoneme_knowing_refPhoneme= DataParser.create_empty_hashmap_matrix_of_phoneme_alignment((double)0);
 				
 		// A hashmap containing (reference,test) phonems list
-		HashMap<String[],String[]> trainPhonemsHashmap  = DataParser.train_to_Hashmap(donnees_app);
+		List<Entry<String[],String[]>> trainPhonemsSet  = DataParser.train_to_List(donnees_app);
 		
 		
 		// For each example in train data
-		for (String[] ref_phonemes : trainPhonemsHashmap.keySet()){
-			String[] test_phonemes = trainPhonemsHashmap.get(ref_phonemes);
+		for (Entry<String[], String[]> ref_test_pair : trainPhonemsSet) {
+			String[] ref_phonemes = ref_test_pair.getKey();
+			String[] test_phonemes = ref_test_pair.getValue();
 			
 //			System.out.println("Reference phonemes : "+Arrays.deepToString(ref_phonemes) + " | test_phonemes : "+Arrays.deepToString(test_phonemes));
 						

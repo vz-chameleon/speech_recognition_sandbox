@@ -27,6 +27,8 @@ public class MainHMMLearning {
 	private static double p_insertion ;
 	private static double p_omission; 
 	
+	private static double cumulated_global_cost = 0;
+	
 	
 	public static void parse_and_update_on_levenshtein_results(String[] levenshtein_result){
 				
@@ -85,9 +87,9 @@ public class MainHMMLearning {
 	}
 	
 	public static void apprentissage_HMM_discret(File modeleHMM_init, File donnees_app, String modl_appris_output_filename) throws IOException{
-
+		cumulated_global_cost=0;
 		//Initialise Levenshtein's distance costs using the transition porbabilities of the initial HMM model
-		//Levenshtein.initialise_with_HMM_model_costs(modeleHMM_init);
+		Levenshtein.initialise_with_HMM_model_costs(modeleHMM_init);
 		
 		//Initialize the structures for counting occurrences of insertions and phonem alignments
 		n_ins_vector = DataParser.create_empty_hashmap_for_phoneme_occurrence((int)0);
@@ -106,11 +108,11 @@ public class MainHMMLearning {
 		for (String[] ref_phonemes : trainPhonemsHashmap.keySet()){
 			String[] test_phonemes = trainPhonemsHashmap.get(ref_phonemes);
 			
-			System.out.println("Reference phonemes : "+Arrays.deepToString(ref_phonemes) + " | test_phonemes : "+Arrays.deepToString(test_phonemes));
+//			System.out.println("Reference phonemes : "+Arrays.deepToString(ref_phonemes) + " | test_phonemes : "+Arrays.deepToString(test_phonemes));
 						
 			char[][] tempPath = new char[test_phonemes.length+1][ref_phonemes.length+1];
 			double tempCost = Levenshtein.levenshteinDistance(test_phonemes, ref_phonemes, tempPath);
-			
+			cumulated_global_cost+=tempCost;
 			parse_and_update_on_levenshtein_results(Levenshtein.optimalTransformationsDisplayableStringArray(tempPath, test_phonemes, ref_phonemes));
 		}
 		
@@ -157,7 +159,6 @@ public class MainHMMLearning {
 		
 		//Export model to outpul file
 		DataParser.export_trained_model_to_file(p_substitution, p_insertion, p_omission, p_testPhoneme_knowing_insertion, p_testPhoneme_knowing_refPhoneme, modl_appris_output_filename);
-		
 	}
 		
 		
@@ -171,6 +172,19 @@ public class MainHMMLearning {
 		
 		try {
 			apprentissage_HMM_discret(modeleHMM_init, trainData, "resources/learning_trained/model_trained_1.dat");
+			System.out.println("Coût Global Cumulé : "+MainHMMLearning.cumulated_global_cost);
+
+			apprentissage_HMM_discret(new File("resources/learning_trained/model_trained_1.dat"), trainData, "resources/learning_trained/model_trained_2.dat");
+			System.out.println("Coût Global Cumulé : "+MainHMMLearning.cumulated_global_cost);
+		
+			apprentissage_HMM_discret(new File("resources/learning_trained/model_trained_2.dat"), trainData, "resources/learning_trained/model_trained_3.dat");
+			System.out.println("Coût Global Cumulé : "+MainHMMLearning.cumulated_global_cost);
+		
+			apprentissage_HMM_discret(new File("resources/learning_trained/model_trained_3.dat"), trainData, "resources/learning_trained/model_trained_4.dat");
+			System.out.println("Coût Global Cumulé : "+MainHMMLearning.cumulated_global_cost);
+		
+			apprentissage_HMM_discret(new File("resources/learning_trained/model_trained_4.dat"), trainData, "resources/learning_trained/model_trained_5.dat");
+			System.out.println("Coût Global Cumulé : "+MainHMMLearning.cumulated_global_cost);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
